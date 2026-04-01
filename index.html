@@ -127,11 +127,37 @@
     .nav-logo {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+    }
+    .nav-logo-circle {
+      width: 102px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #357fc0;
+      border: 2px solid transparent;
+      background-image: 
+        linear-gradient(#357fc0, #357fc0),
+        linear-gradient(135deg, var(--gray-200), transparent);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      flex-shrink: 0;
+      transition: all var(--transition);
+    }
+    .nav-logo-circle:hover {
+      background-image: 
+        linear-gradient(#357fc0, #357fc0),
+        linear-gradient(135deg, var(--accent), transparent);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
     }
     .nav-logo img {
-      height: 36px;
-      width: auto;
+      height: 100px;
+      width: 100px;
+      object-fit: contain;
+      object-position: center;
     }
     .nav-logo-text {
       font-family: var(--font-head);
@@ -568,9 +594,30 @@
     .footer-logo {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
-    .footer-logo img { height: 32px; filter: brightness(0) invert(1) opacity(0.8); }
+    .footer-logo-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(232, 242, 251, 0.3);
+      border: 2px solid transparent;
+      background-image: 
+        linear-gradient(rgba(232, 242, 251, 0.3), rgba(232, 242, 251, 0.3)),
+        linear-gradient(135deg, rgba(255,255,255,0.25), transparent);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      flex-shrink: 0;
+    }
+    .footer-logo img {
+      height: 42px;
+      width: 42px;
+      object-fit: contain;
+      filter: brightness(0) invert(1) opacity(0.9);
+    }
     .footer-logo-text {
       font-family: var(--font-head);
       font-weight: 800;
@@ -618,6 +665,8 @@
       padding: 4px;
       background: none;
       border: none;
+      z-index: 101;
+      position: relative;
     }
     .hamburger span {
       display: block;
@@ -625,6 +674,65 @@
       background: var(--navy-deep);
       border-radius: 2px;
       transition: all var(--transition);
+    }
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(10px, 10px);
+    }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+    
+    /* Mobile Menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 68px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--white);
+      z-index: 99;
+      padding: 28px;
+      overflow-y: auto;
+      flex-direction: column;
+      gap: 24px;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .mobile-menu.active {
+      display: flex;
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Prevent body scroll when menu is open */
+    body.menu-open {
+      overflow: hidden;
+    }
+    .mobile-menu .nav-links {
+      flex-direction: column;
+      gap: 20px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .mobile-menu .nav-links a {
+      font-family: var(--font-head);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--navy-deep);
+    }
+    .mobile-menu .nav-cta {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu .nav-cta .btn {
+      width: 100%;
+      justify-content: center;
     }
 
     /* ── Reveal animations ── */
@@ -652,6 +760,7 @@
       .about-stats { order: -1; }
       .nav-links, .nav-cta { display: none; }
       .hamburger { display: flex; }
+      .mobile-menu { display: none; }
     }
     @media (max-width: 600px) {
       section { padding: 64px 0; }
@@ -670,8 +779,10 @@
   <nav>
     <div class="container nav-inner">
       <a href="#" class="nav-logo">
-        <img src="Climb logo.png" alt="Climb logo" onerror="this.style.display='none'">
-        <span class="nav-logo-text">Climb</span>
+        <div class="nav-logo-circle">
+          <img src="climb logo.png" alt="Climb logo" onerror="this.style.display='none'">
+        </div>
+        
       </a>
       <ul class="nav-links">
         <li><a href="#products">Products</a></li>
@@ -681,11 +792,23 @@
       </ul>
       <div class="nav-cta">
         <a href="#products" class="btn btn-outline">Explore</a>
-        <a href="https://t.me/ClimbForexBot" target="_blank" class="btn btn-primary">Get Started</a>
+        <a href="t.me/forex_alert_ug_bot" target="_blank" class="btn btn-primary">Get Started</a>
       </div>
       <button class="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
+    </div>
+    <div class="mobile-menu">
+      <ul class="nav-links">
+        <li><a href="#products">Products</a></li>
+        <li><a href="#why">Why Climb</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="#products" class="btn btn-outline">Explore</a>
+        <a href="t.me/forex_alert_ug_bot" target="_blank" class="btn btn-primary">Get Started</a>
+      </div>
     </div>
   </nav>
 
@@ -753,7 +876,7 @@
           <div class="product-icon icon-blue">📈</div>
           <h3>Forex Alert Bot</h3>
           <p>Track USD/UGX in real-time and get instant Telegram alerts before rates change. Never miss a favorable exchange window again.</p>
-          <a href="https://t.me/ClimbForexBot" target="_blank" class="btn btn-accent">
+          <a href="t.me/forex_alert_ug_bot" target="_blank" class="btn btn-accent">
             Try on Telegram
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
@@ -843,7 +966,7 @@
     <div class="container cta-inner reveal">
       <h2>Start making smarter decisions today</h2>
       <p>Join others who use Climb to stay ahead of currency shifts and data trends.</p>
-      <a href="https://t.me/ClimbForexBot" target="_blank" class="btn btn-accent">
+      <a href="t.me/forex_alert_ug_bot" target="_blank" class="btn btn-accent">
         Try Forex Alerts on Telegram
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </a>
@@ -854,8 +977,9 @@
   <footer id="contact">
     <div class="container">
       <div class="footer-inner">
-        <div class="footer-logo">
-          <img src="Climb logo.png" alt="Climb" onerror="this.style.display='none'">
+        
+          
+          </div>
           <span class="footer-logo-text">Climb</span>
         </div>
         <ul class="footer-links">
@@ -866,13 +990,44 @@
         </ul>
       </div>
       <div class="footer-bottom">
-        <p class="footer-copy">© 2025 Climb. All rights reserved.</p>
+        <p class="footer-copy">© 2026 Climb. All rights reserved.</p>
         <p class="footer-tagline">Smart data for smarter decisions.</p>
       </div>
     </div>
   </footer>
 
   <script>
+    // Hamburger menu toggle
+    const hamburger = document.querySelector('.hamburger');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const body = document.body;
+    
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      mobileMenu.classList.toggle('active');
+      body.classList.toggle('menu-open');
+    });
+    
+    // Close mobile menu when clicking a link
+    const mobileLinks = mobileMenu.querySelectorAll('a');
+    mobileLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('active');
+        body.classList.remove('menu-open');
+      });
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const isMouseInside = mobileMenu.contains(e.target) || hamburger.contains(e.target);
+      if (!isMouseInside && mobileMenu.classList.contains('active')) {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('active');
+        body.classList.remove('menu-open');
+      }
+    });
+    
     // Scroll reveal
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => {
