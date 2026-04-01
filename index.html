@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Climb — Smart Data Tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Variables ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #2b3a52;
+      --navy-deep: #1c2a3d;
+      --navy-mid:  #344563;
+      --slate:     #3d5068;
+      --ice:       #f4f6f9;
+      --white:     #ffffff;
+      --gray-100:  #f0f2f5;
+      --gray-200:  #e2e6ec;
+      --gray-400:  #8a95a3;
+      --gray-600:  #555f6d;
+      --accent:    #4a90d9;
+      --accent-lt: #e8f2fb;
+      --green:     #2ecc87;
+      --font-head: 'Sora', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --shadow-sm: 0 2px 8px rgba(43,58,82,0.07);
+      --shadow-md: 0 6px 24px rgba(43,58,82,0.10);
+      --shadow-lg: 0 16px 48px rgba(43,58,82,0.13);
+      --radius:    12px;
+      --radius-lg: 20px;
+      --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--navy-deep);
+      background: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Typography ── */
+    h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+    h1 { font-size: clamp(2.4rem, 5vw, 3.8rem); }
+    h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); }
+    h3 { font-size: 1.2rem; font-weight: 600; }
+    p  { font-size: 1.05rem; color: var(--gray-600); line-height: 1.75; }
+
+    a { text-decoration: none; color: inherit; }
+
+    .container {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 28px;
+      border-radius: 8px;
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      border: none;
+      letter-spacing: 0.01em;
+    }
+    .btn-primary {
+      background: var(--navy);
+      color: var(--white);
+    }
+    .btn-primary:hover {
+      background: var(--navy-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(43,58,82,0.25);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--navy);
+      border: 1.5px solid var(--navy-mid);
+    }
+    .btn-outline:hover {
+      background: var(--navy);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
+    .btn-accent {
+      background: var(--accent);
+      color: var(--white);
+    }
+    .btn-accent:hover {
+      background: #357fc0;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(74,144,217,0.3);
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--gray-200);
+      height: 68px;
+      display: flex;
+      align-items: center;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-logo img {
+      height: 36px;
+      width: auto;
+    }
+    .nav-logo-text {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.35rem;
+      color: var(--navy-deep);
+      letter-spacing: -0.03em;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-head);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gray-600);
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--navy-deep); }
+    .nav-cta { display: flex; gap: 12px; align-items: center; }
+    .nav-cta .btn { padding: 9px 22px; font-size: 0.88rem; }
+
+    /* ── HERO ── */
+    .hero {
+      padding-top: 130px;
+      padding-bottom: 90px;
+      background: linear-gradient(160deg, #f8fafc 0%, #edf1f7 55%, #e4ebf5 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(74,144,217,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -60px;
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(43,58,82,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--accent-lt);
+      color: var(--accent);
+      border: 1px solid rgba(74,144,217,0.25);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-family: var(--font-head);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      letter-spacing: 0.03em;
+    }
+    .hero-badge span.dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .hero h1 {
+      margin-bottom: 22px;
+      color: var(--navy-deep);
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--gray-600);
+      margin-bottom: 36px;
+      max-width: 480px;
+      line-height: 1.8;
+    }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    /* Abstract dashboard illustration */
+    .hero-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 28px;
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid var(--gray-200);
+      animation: floatCard 4s ease-in-out infinite;
+    }
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .hero-card-title {
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--navy-deep);
+    }
+    .hero-card-badge {
+      background: #e6f9f1;
+      color: var(--green);
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--font-head);
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+    .rate-display {
+      text-align: center;
+      padding: 18px 0 22px;
+      border-bottom: 1px solid var(--gray-200);
+      margin-bottom: 20px;
+    }
+    .rate-label { font-size: 0.78rem; color: var(--gray-400); font-family: var(--font-head); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+    .rate-value { font-family: var(--font-head); font-size: 2.8rem; font-weight: 800; color: var(--navy-deep); letter-spacing: -0.03em; }
+    .rate-change { font-size: 0.85rem; color: var(--green); font-weight: 600; font-family: var(--font-head); margin-top: 4px; }
+    .sparkline { margin-bottom: 20px; }
+    .sparkline-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+      height: 52px;
+    }
+    .bar {
+      flex: 1;
+      background: var(--gray-200);
+      border-radius: 4px 4px 0 0;
+      transition: background var(--transition);
+    }
+    .bar.active { background: var(--accent); }
+    .bar:nth-child(1)  { height: 35%; }
+    .bar:nth-child(2)  { height: 55%; }
+    .bar:nth-child(3)  { height: 45%; }
+    .bar:nth-child(4)  { height: 70%; }
+    .bar:nth-child(5)  { height: 60%; }
+    .bar:nth-child(6)  { height: 80%; }
+    .bar:nth-child(7)  { height: 65%; }
+    .bar:nth-child(8)  { height: 90%; }
+    .bar:nth-child(9)  { height: 75%; }
+    .bar:nth-child(10) { height: 100%; }
+    .hero-card-alert {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent-lt);
+      border: 1px solid rgba(74,144,217,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: var(--navy);
+      font-family: var(--font-head);
+      font-weight: 500;
+    }
+    .alert-icon { font-size: 1rem; }
+
+    /* Floating mini cards */
+    .hero-pill {
+      position: absolute;
+      background: var(--white);
+      border-radius: 100px;
+      box-shadow: var(--shadow-md);
+      padding: 8px 16px;
+      font-family: var(--font-head);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--navy);
+      border: 1px solid var(--gray-200);
+      white-space: nowrap;
+    }
+    .hero-pill-1 { top: -16px; right: -10px; animation: floatPill1 3.5s ease-in-out infinite; }
+    .hero-pill-2 { bottom: 20px; left: -20px; animation: floatPill2 4.2s ease-in-out infinite; }
+    @keyframes floatPill1 {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-8px) rotate(1deg); }
+    }
+    @keyframes floatPill2 {
+      0%, 100% { transform: translateY(0) rotate(1deg); }
+      50% { transform: translateY(8px) rotate(-2deg); }
+    }
+
+    /* ── SECTION SHARED ── */
+    section { padding: 96px 0; }
+    .section-tag {
+      display: inline-block;
+      font-family: var(--font-head);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .section-head {
+      margin-bottom: 14px;
+      color: var(--navy-deep);
+    }
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--gray-600);
+      max-width: 540px;
+      line-height: 1.8;
+    }
+    .section-intro { margin-bottom: 56px; }
+
+    /* ── PRODUCTS ── */
+    .products { background: var(--white); }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 26px;
+    }
+    .product-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--navy);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--transition);
+    }
+    .product-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+      border-color: transparent;
+    }
+    .product-card:hover::before { transform: scaleX(1); }
+    .product-card.featured { border-color: var(--accent); background: linear-gradient(160deg, #f7fbff, var(--white)); }
+    .product-card.featured::before { transform: scaleX(1); background: var(--accent); }
+    .product-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 22px;
+    }
+    .icon-blue  { background: var(--accent-lt); }
+    .icon-slate { background: var(--gray-100); }
+    .icon-navy  { background: rgba(43,58,82,0.08); }
+    .product-card h3 {
+      font-size: 1.1rem;
+      color: var(--navy-deep);
+      margin-bottom: 10px;
+    }
+    .product-card p {
+      font-size: 0.93rem;
+      color: var(--gray-600);
+      line-height: 1.7;
+      flex: 1;
+      margin-bottom: 24px;
+    }
+    .coming-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gray-100);
+      color: var(--gray-600);
+      font-family: var(--font-head);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 100px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── WHY CLIMB ── */
+    .why { background: var(--ice); }
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+    .why-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 36px 30px;
+      border: 1px solid var(--gray-200);
+      transition: all var(--transition);
+    }
+    .why-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+    }
+    .why-number {
+      font-family: var(--font-head);
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--gray-200);
+      line-height: 1;
+      margin-bottom: 16px;
+      letter-spacing: -0.04em;
+    }
+    .why-card h3 {
+      color: var(--navy-deep);
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+    .why-card p { font-size: 0.93rem; line-height: 1.75; }
+
+    /* ── ABOUT ── */
+    .about { background: var(--white); }
+    .about-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .about-text h2 { margin-bottom: 20px; }
+    .about-text p { margin-bottom: 16px; }
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .stat-card {
+      background: var(--ice);
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid var(--gray-200);
+    }
+    .stat-value {
+      font-family: var(--font-head);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--navy-deep);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--gray-600);
+      font-family: var(--font-head);
+      font-weight: 500;
+    }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      background: var(--navy-deep);
+      padding: 96px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(74,144,217,0.18) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .cta-section::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -80px;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .cta-inner {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .cta-inner h2 {
+      color: var(--white);
+      margin-bottom: 16px;
+      font-size: clamp(2rem, 4vw, 3rem);
+    }
+    .cta-inner p {
+      color: rgba(255,255,255,0.65);
+      font-size: 1.05rem;
+      margin-bottom: 38px;
+    }
+    .cta-inner .btn-accent { padding: 15px 36px; font-size: 1rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy-deep);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 48px 0 36px;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 28px;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-logo img { height: 32px; filter: brightness(0) invert(1) opacity(0.8); }
+    .footer-logo-text {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: -0.02em;
+    }
+    .footer-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+    .footer-links a {
+      font-family: var(--font-head);
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.5);
+      transition: color var(--transition);
+    }
+    .footer-links a:hover { color: rgba(255,255,255,0.9); }
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.3);
+      font-family: var(--font-head);
+    }
+    .footer-tagline {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.3);
+      font-family: var(--font-head);
+    }
+
+    /* ── Hamburger (Mobile) ── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--navy-deep);
+      border-radius: 2px;
+      transition: all var(--transition);
+    }
+
+    /* ── Reveal animations ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+      .hero-visual { order: -1; }
+      .hero-card { max-width: 360px; }
+      .products-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+      .why-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+      .about-inner { grid-template-columns: 1fr; gap: 40px; }
+      .about-stats { order: -1; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 64px 0; }
+      .hero { padding-top: 100px; padding-bottom: 64px; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions .btn { width: 100%; justify-content: center; }
+      .about-stats { grid-template-columns: 1fr 1fr; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="#" class="nav-logo">
+        <img src="Climb logo.png" alt="Climb logo" onerror="this.style.display='none'">
+        <span class="nav-logo-text">Climb</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#products">Products</a></li>
+        <li><a href="#why">Why Climb</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="#products" class="btn btn-outline">Explore</a>
+        <a href="https://t.me/ClimbForexBot" target="_blank" class="btn btn-primary">Get Started</a>
+      </div>
+      <button class="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          Now live — Forex Alert Bot
+        </div>
+        <h1>Climb Higher<br>with <em>Smart Data</em></h1>
+        <p class="hero-sub">
+          Simple tools that help you make better financial and business decisions in real time.
+        </p>
+        <div class="hero-actions">
+          <a href="https://t.me/ClimbForexBot" target="_blank" class="btn btn-primary">
+            Get Started
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="#products" class="btn btn-outline">Explore Products</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-pill hero-pill-1">📡 Live Rate Updates</div>
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span class="hero-card-title">USD / UGX</span>
+            <span class="hero-card-badge">● LIVE</span>
+          </div>
+          <div class="rate-display">
+            <div class="rate-label">Exchange Rate</div>
+            <div class="rate-value">3,840<span style="font-size:1.4rem;color:var(--gray-400)">.50</span></div>
+            <div class="rate-change">▲ +12.30 (0.32%) today</div>
+          </div>
+          <div class="sparkline">
+            <div style="font-size:0.72rem;color:var(--gray-400);font-family:var(--font-head);font-weight:500;margin-bottom:8px;letter-spacing:0.06em;text-transform:uppercase;">7-day trend</div>
+            <div class="sparkline-bars">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              <div class="bar active"></div>
+            </div>
+          </div>
+          <div class="hero-card-alert">
+            <span class="alert-icon">🔔</span>
+            Alert: Rate crossed your threshold of 3,820
+          </div>
+        </div>
+        <div class="hero-pill hero-pill-2">✅ Smart Alerts Sent</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="products" id="products">
+    <div class="container">
+      <div class="section-intro reveal">
+        <span class="section-tag">Our Products</span>
+        <h2 class="section-head">Data tools built for real decisions</h2>
+        <p class="section-sub">From currency tracking to business intelligence — we turn complex data into simple, actionable tools.</p>
+      </div>
+      <div class="products-grid">
+        <div class="product-card featured reveal">
+          <div class="product-icon icon-blue">📈</div>
+          <h3>Forex Alert Bot</h3>
+          <p>Track USD/UGX in real-time and get instant Telegram alerts before rates change. Never miss a favorable exchange window again.</p>
+          <a href="https://t.me/ClimbForexBot" target="_blank" class="btn btn-accent">
+            Try on Telegram
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+        <div class="product-card reveal reveal-delay-1">
+          <div class="product-icon icon-slate">🌤</div>
+          <h3>Weather Insights</h3>
+          <p>Plan better with accurate, localized weather alerts. Know when to act — for farming, travel, or logistics — before conditions shift.</p>
+          <span class="coming-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Coming Soon
+          </span>
+        </div>
+        <div class="product-card reveal reveal-delay-2">
+          <div class="product-icon icon-navy">📊</div>
+          <h3>Business Intelligence</h3>
+          <p>Understand trends and make smarter decisions. Climb BI gives you the clarity to act with confidence, not guesswork.</p>
+          <span class="coming-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Coming Soon
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY CLIMB -->
+  <section class="why" id="why">
+    <div class="container">
+      <div class="section-intro reveal">
+        <span class="section-tag">Why Climb</span>
+        <h2 class="section-head">Built for how you actually work</h2>
+        <p class="section-sub">We believe great data tools should be simple, fast, and built for everyday people — not just data scientists.</p>
+      </div>
+      <div class="why-grid">
+        <div class="why-card reveal">
+          <div class="why-number">01</div>
+          <h3>Real-time Data</h3>
+          <p>Every tool is powered by live data streams. You get the most current picture — whether it's exchange rates, weather patterns, or market signals — the moment it matters.</p>
+        </div>
+        <div class="why-card reveal reveal-delay-1">
+          <div class="why-number">02</div>
+          <h3>Simple Tools</h3>
+          <p>No dashboards to configure or APIs to learn. Our tools are designed to work instantly, with zero technical knowledge required. If you can use a messaging app, you can use Climb.</p>
+        </div>
+        <div class="why-card reveal reveal-delay-2">
+          <div class="why-number">03</div>
+          <h3>Built for Everyday Decisions</h3>
+          <p>From traders to farmers to business owners — Climb is built for real people making real decisions. Data that fits into your day, not the other way around.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="container about-inner">
+      <div class="about-text reveal">
+        <span class="section-tag">About Us</span>
+        <h2 class="section-head">Turning complexity into clarity</h2>
+        <p>Climb builds simple, powerful tools that turn complex data into actionable insights for individuals and businesses. We believe the best decisions come from having the right information at the right time.</p>
+        <p>Founded with a mission to democratize data intelligence, we start with the tools that matter most to everyday users — and grow from there.</p>
+      </div>
+      <div class="about-stats reveal reveal-delay-1">
+        <div class="stat-card">
+          <div class="stat-value">24/7</div>
+          <div class="stat-label">Live monitoring, always on</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">Real‑time</div>
+          <div class="stat-label">Up-to-date exchange rates</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">Instant</div>
+          <div class="stat-label">Telegram alerts delivered fast</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">Free</div>
+          <div class="stat-label">No cost to get started today</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container cta-inner reveal">
+      <h2>Start making smarter decisions today</h2>
+      <p>Join others who use Climb to stay ahead of currency shifts and data trends.</p>
+      <a href="https://t.me/ClimbForexBot" target="_blank" class="btn btn-accent">
+        Try Forex Alerts on Telegram
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="contact">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">
+          <img src="Climb logo.png" alt="Climb" onerror="this.style.display='none'">
+          <span class="footer-logo-text">Climb</span>
+        </div>
+        <ul class="footer-links">
+          <li><a href="#products">Products</a></li>
+          <li><a href="#why">Why Climb</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="mailto:hello@climb.ug">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 Climb. All rights reserved.</p>
+        <p class="footer-tagline">Smart data for smarter decisions.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Animate bars on load
+    setTimeout(() => {
+      document.querySelectorAll('.bar').forEach((b, i) => {
+        setTimeout(() => b.style.opacity = '1', i * 60);
+      });
+    }, 800);
+
+    // Live rate ticker simulation
+    const rateEl = document.querySelector('.rate-value');
+    const changeEl = document.querySelector('.rate-change');
+    if (rateEl) {
+      let base = 3840.50;
+      setInterval(() => {
+        const delta = (Math.random() - 0.48) * 4;
+        base = Math.max(3800, Math.min(3900, base + delta));
+        const wholePart = Math.floor(base).toLocaleString();
+        const decPart = (base % 1).toFixed(2).slice(1);
+        rateEl.innerHTML = `${wholePart}<span style="font-size:1.4rem;color:var(--gray-400)">${decPart}</span>`;
+        const sign = delta >= 0 ? '▲ +' : '▼ ';
+        const color = delta >= 0 ? 'var(--green)' : '#e74c3c';
+        changeEl.style.color = color;
+        changeEl.textContent = `${sign}${Math.abs(delta).toFixed(2)} today`;
+      }, 2800);
+    }
+  </script>
+</body>
+</html>
