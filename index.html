@@ -498,6 +498,60 @@
     }
     .why-card p { font-size: 0.93rem; line-height: 1.75; }
 
+    /* ── BLOG ── */
+    .blog { background: var(--white); }
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .blog-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+      transition: all var(--transition);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+    }
+    .blog-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-5px);
+      border-color: rgba(74,144,217,0.2);
+    }
+    .blog-card-image {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      display: block;
+    }
+    .blog-card-content {
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 14px;
+    }
+    .blog-card h3 {
+      font-size: 1.15rem;
+      color: var(--navy-deep);
+      line-height: 1.4;
+      margin: 0;
+    }
+    .blog-card p {
+      font-size: 0.93rem;
+      color: var(--gray-600);
+      line-height: 1.7;
+      flex: 1;
+      margin: 0;
+    }
+    .blog-card .btn {
+      align-self: flex-start;
+      padding: 10px 20px;
+      font-size: 0.88rem;
+    }
+
     /* ── ABOUT ── */
     .about { background: var(--white); }
     .about-inner {
@@ -756,6 +810,7 @@
       .hero-card { max-width: 360px; }
       .products-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
       .why-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+      .blog-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
       .about-inner { grid-template-columns: 1fr; gap: 40px; }
       .about-stats { order: -1; }
       .nav-links, .nav-cta { display: none; }
@@ -768,6 +823,7 @@
       .hero-actions { flex-direction: column; }
       .hero-actions .btn { width: 100%; justify-content: center; }
       .about-stats { grid-template-columns: 1fr 1fr; }
+      .blog-grid { grid-template-columns: 1fr; }
       .footer-inner { flex-direction: column; align-items: flex-start; }
       .footer-bottom { flex-direction: column; align-items: flex-start; }
     }
@@ -787,6 +843,7 @@
       <ul class="nav-links">
         <li><a href="#products">Products</a></li>
         <li><a href="#why">Why Climb</a></li>
+        <li><a href="#blog">Blog</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
@@ -802,6 +859,7 @@
       <ul class="nav-links">
         <li><a href="#products">Products</a></li>
         <li><a href="#why">Why Climb</a></li>
+        <li><a href="#blog">Blog</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
@@ -962,41 +1020,47 @@
   </section>
 
 
-   <!-- BLOG-->
-  <section class="why" id="why">
+  <!-- BLOG -->
+  <section class="blog" id="blog">
     <div class="container">
       <div class="section-intro reveal">
-        <span class="section-tag">Blogs</span>
-        <h2 class="section-head">Data insights</h2>
-        <p class="section-sub">Great smart data in action with the world applications, interesting food for thoughts</p>
+        <span class="section-tag">Blog</span>
+        <h2 class="section-head">Data Insights</h2>
+        <p class="section-sub">Explore practical guides and insights on currency exchange, market trends, and making smarter financial decisions with real-time data.</p>
       </div>
-      <div class="why-grid">
-        <div class="why-card reveal">
-          <div class="why-number">01</div>
-          <h3>Real-time Data</h3>
-          <p>Every tool is powered by live data streams. You get the most current picture — whether it's exchange rates, weather patterns, or market signals — the moment it matters.</p>
-             <a href="t.me/forex_alert_ug_bot" target="_blank" class="btn btn-accent">
-            Read
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
+      <div class="blog-grid">
+        <div class="blog-card reveal">
+          <img src="https://images.unsplash.com/photo-1565514020179-026b92b2d6c3" alt="Best Time to Exchange Dollars" class="blog-card-image">
+          <div class="blog-card-content">
+            <h3>Best Time to Exchange Dollars in Uganda</h3>
+            <p>Discover the optimal timing strategies for exchanging USD to UGX. Learn how to monitor market trends and identify the best windows for currency conversion to maximize your returns.</p>
+            <a href="best-time-exchange-uganda.html" target="_blank" class="btn btn-accent">
+              Read More
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
         </div>
-        <div class="why-card reveal reveal-delay-1">
-          <div class="why-number">02</div>
-          <h3>Simple Tools</h3>
-          <p>No dashboards to configure or APIs to learn. Our tools are designed to work instantly, with zero technical knowledge required. If you can use a messaging app, you can use Climb.</p>
-             <a href="t.me/forex_alert_ug_bot" target="_blank" class="btn btn-accent">
-            Read
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
+        <div class="blog-card reveal reveal-delay-1">
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71" alt="Why Exchange Rates Change" class="blog-card-image">
+          <div class="blog-card-content">
+            <h3>Why USD/UGX Exchange Rates Keep Changing</h3>
+            <p>Understand the key factors that drive currency fluctuations. From economic indicators to global market movements, learn what causes rate volatility and how to stay informed.</p>
+            <a href="why-usd-ugx-rates-change.html" target="_blank" class="btn btn-accent">
+              Read More
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
         </div>
-        <div class="why-card reveal reveal-delay-2">
-          <div class="why-number">03</div>
-          <h3>Built for Everyday Decisions</h3>
-          <p>From traders to farmers to business owners — Climb is built for real people making real decisions. Data that fits into your day, not the other way around.</p>
-             <a href="t.me/forex_alert_ug_bot" target="_blank" class="btn btn-accent">
-            Read
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
+        <div class="blog-card reveal reveal-delay-2">
+          <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" alt="Forex Alerts Save Money" class="blog-card-image">
+          <div class="blog-card-content">
+            <h3>How Real-Time Forex Alerts Can Save You Money</h3>
+            <p>Learn how automated alerts help you catch favorable rates without constant monitoring. Explore real-world examples of how timely notifications lead to smarter financial decisions.</p>
+            <a href="forex-alerts-save-money.html" target="_blank" class="btn btn-accent">
+              Read More
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -1027,6 +1091,7 @@
         <ul class="footer-links">
           <li><a href="#products">Products</a></li>
           <li><a href="#why">Why Climb</a></li>
+          <li><a href="#blog">Blog</a></li>
           <li><a href="#about">About</a></li>
           <li><a href="mailto:hello@climb.ug">Contact</a></li>
         </ul>
