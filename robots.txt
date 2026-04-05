@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+sitemap:  https://developer1-2.github.io/Climb/sitemap.xml
