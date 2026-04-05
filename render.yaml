@@ -3,8 +3,8 @@ services:
     name: financial-bot-worker
     env: python
     plan: starter
-    buildCommand: cd "Financial bot" && pip install -r requirements.txt
-    startCommand: cd "Financial bot" && python run.py
+    buildCommand: cd financial_bot && pip install -r requirements.txt
+    startCommand: cd financial_bot && python run.py
     envVars:
       - key: PYTHON_VERSION
         value: 3.13
