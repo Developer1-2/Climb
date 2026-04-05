@@ -1,0 +1,14 @@
+services:
+  - type: worker
+    name: financial-bot-worker
+    env: python
+    plan: starter
+    buildCommand: cd "Financial bot" && pip install -r requirements.txt
+    startCommand: cd "Financial bot" && python run.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: sqlite:///./exchange_rates.db
