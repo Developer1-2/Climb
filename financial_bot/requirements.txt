@@ -1,8 +1,8 @@
 python-telegram-bot==22.7
 SQLAlchemy==2.0.40
 requests==2.32.3
-APScheduler==3.6.3
+APScheduler==4.0
 python-dotenv==1.1.0
 pytz==2025.2
-setuptools
-pkg_resources
+setuptools>=70.0.0
+
