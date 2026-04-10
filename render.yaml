@@ -12,3 +12,10 @@ services:
         value: production
       - key: DATABASE_URL
         value: sqlite:///./exchange_rates.db
+      - key: BOT_TOKEN
+        sync: false
+    scaling:
+      minInstances: 1
+      maxInstances: 1     
+
+ 

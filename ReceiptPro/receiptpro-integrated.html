@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReceiptPro — Instant Professional Receipts</title>
+  <!-- Fonts: Syne (display) + DM Sans (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <!-- html2pdf CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    /* ============================================================
+       DESIGN TOKENS
+    ============================================================ */
+    :root {
+      --ink:        #0f0f10;
+      --ink-muted:  #6b6b74;
+      --ink-faint:  #c4c4cc;
+      --surface:    #f7f7f8;
+      --white:      #ffffff;
+      --accent:     #1a56db;
+      --accent-dim: #dce9ff;
+      --success:    #16a34a;
+      --wa-green:   #25d366;
+      --wa-dark:    #128c7e;
+      --radius-sm:  8px;
+      --radius-md:  14px;
+      --radius-lg:  22px;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-md:  0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.07);
+      --shadow-lg:  0 12px 40px rgba(0,0,0,.13), 0 4px 12px rgba(0,0,0,.08);
+      --transition: 220ms cubic-bezier(.4,0,.2,1);
+    }
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* ============================================================
+       TOPBAR
+    ============================================================ */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid rgba(0,0,0,.07);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .topbar-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--ink);
+      letter-spacing: -.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .topbar-logo span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px; height: 30px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      font-size: .9rem;
+    }
+    .topbar-badge {
+      font-size: .72rem;
+      font-weight: 600;
+      background: var(--accent-dim);
+      color: var(--accent);
+      padding: 3px 10px;
+      border-radius: 99px;
+      letter-spacing: .3px;
+    }
+    /* Upgrade button in topbar */
+    .btn-upgrade-topbar {
+      font-size: .78rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 99px;
+      cursor: pointer;
+      letter-spacing: .3px;
+      transition: opacity var(--transition), transform var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-upgrade-topbar:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-upgrade-topbar.hidden { display: none; }
+    /* ============================================================
+       HERO STRIP
+    ============================================================ */
+    .hero {
+      background: var(--white);
+      padding: 36px 24px 32px;
+      text-align: center;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      line-height: 1.15;
+      letter-spacing: -.5px;
+      color: var(--ink);
+    }
+    .hero h1 em { font-style: normal; color: var(--accent); }
+    .hero p {
+      margin-top: 10px;
+      color: var(--ink-muted);
+      font-size: .95rem;
+      font-weight: 400;
+      max-width: 440px;
+      margin-left: auto; margin-right: auto;
+      line-height: 1.6;
+    }
+    /* ============================================================
+       MAIN LAYOUT
+    ============================================================ */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+    @media (min-width: 800px) {
+      .main {
+        grid-template-columns: 420px 1fr;
+        align-items: start;
+      }
+    }
+    /* ============================================================
+       CARD
+    ============================================================ */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-header-icon {
+      width: 34px; height: 34px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .card-header-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--ink);
+    }
+    .card-header-sub {
+      font-size: .78rem;
+      color: var(--ink-muted);
+      margin-top: 1px;
+    }
+    .card-body { padding: 24px; }
+    /* ============================================================
+       FORM
+    ============================================================ */
+    .field { margin-bottom: 18px; }
+    .field:last-of-type { margin-bottom: 0; }
+    label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="tel"],
+    select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--ink-faint);
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      color: var(--ink);
+      background: var(--white);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+      appearance: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(26,86,219,.14);
+    }
+    input.error { border-color: #ef4444; }
+    input.error:focus { box-shadow: 0 0 0 3px rgba(239,68,68,.14); }
+    .field-error {
+      font-size: .76rem;
+      color: #ef4444;
+      margin-top: 4px;
+      display: none;
+    }
+    .field-error.visible { display: block; }
+    /* currency wrapper */
+    .amount-wrap { position: relative; }
+    .amount-prefix {
+      position: absolute;
+      left: 13px; top: 50%;
+      transform: translateY(-50%);
+      font-weight: 600;
+      color: var(--ink-muted);
+      pointer-events: none;
+      font-size: .95rem;
+    }
+    .amount-wrap input { padding-left: 34px; }
+    /* Currency selector row */
+    .currency-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 10px;
+      align-items: end;
+    }
+    /* Generate button */
+    .btn-generate {
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: .2px;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-generate:hover {
+      background: #1447c0;
+      box-shadow: 0 4px 16px rgba(26,86,219,.35);
+      transform: translateY(-1px);
+    }
+    .btn-generate:active { transform: translateY(0); }
+    /* ============================================================
+       PREVIEW COLUMN
+    ============================================================ */
+    .preview-col { display: flex; flex-direction: column; gap: 20px; }
+    /* -------- empty state -------- */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 56px 24px;
+      gap: 14px;
+      text-align: center;
+    }
+    .empty-icon {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+    }
+    .empty-state h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--ink);
+    }
+    .empty-state p { font-size: .85rem; color: var(--ink-muted); max-width: 220px; line-height: 1.5; }
+    /* ============================================================
+       RECEIPT PREVIEW
+    ============================================================ */
+    .receipt-wrapper {
+      display: none; /* shown after generate */
+      animation: fadeSlideUp .35s ease both;
+    }
+    .receipt-wrapper.visible { display: block; }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* The actual receipt — also used for PDF export */
+    #receipt {
+      background: var(--white);
+      border-radius: 0; /* card handles radius */
+      padding: 32px 28px 28px;
+      position: relative;
+    }
+    .receipt-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 18px;
+      border-bottom: 2px dashed #e5e7eb;
+    }
+    .receipt-brand-logo {
+      width: 40px; height: 40px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .receipt-biz-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--ink);
+      letter-spacing: -.3px;
+    }
+    .receipt-type-label {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+    .receipt-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+      margin-bottom: 22px;
+    }
+    .receipt-meta-item label {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 2px;
+    }
+    .receipt-meta-item span {
+      font-size: .88rem;
+      color: var(--ink);
+      font-weight: 500;
+    }
+    .receipt-divider {
+      border: none;
+      border-top: 1.5px solid #f3f4f6;
+      margin: 16px 0;
+    }
+    /* Line items table */
+    .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+    .receipt-table thead tr {
+      border-bottom: 1.5px solid #f3f4f6;
+    }
+    .receipt-table th {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      padding: 6px 0 8px;
+      text-align: left;
+    }
+    .receipt-table th:last-child { text-align: right; }
+    .receipt-table td {
+      padding: 10px 0;
+      font-size: .9rem;
+      color: var(--ink);
+      border-bottom: 1px solid #f9fafb;
+    }
+    .receipt-table td:last-child { text-align: right; font-weight: 600; }
+    .receipt-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--accent-dim);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-bottom: 20px;
+    }
+    .receipt-total-label {
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .receipt-total-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -.5px;
+    }
+    .receipt-footer {
+      text-align: center;
+      padding-top: 16px;
+      border-top: 2px dashed #e5e7eb;
+    }
+    .receipt-footer p {
+      font-size: .82rem;
+      color: var(--ink-muted);
+      font-style: italic;
+    }
+    .receipt-watermark {
+      margin-top: 10px;
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    /* decorative corner */
+    .receipt-corner {
+      position: absolute;
+      top: 0; right: 0;
+      width: 60px; height: 60px;
+      background: linear-gradient(225deg, var(--accent-dim) 0%, transparent 60%);
+      border-radius: 0 var(--radius-lg) 0 0;
+      pointer-events: none;
+    }
+    /* ============================================================
+       ACTION BUTTONS
+    ============================================================ */
+    .actions-card { display: none; }
+    .actions-card.visible { display: block; }
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .btn-action {
+      padding: 13px 16px;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all var(--transition);
+    }
+    .btn-action:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .btn-pdf {
+      background: var(--ink);
+      color: #fff;
+    }
+    .btn-pdf:hover {
+      background: #1f1f24;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-whatsapp {
+      background: var(--wa-green);
+      color: #fff;
+    }
+    .btn-whatsapp:hover {
+      background: var(--wa-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(37,211,102,.35);
+    }
+    /* ============================================================
+       TOAST NOTIFICATION
+    ============================================================ */
+    .toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--ink);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: .85rem;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .page-footer {
+      text-align: center;
+      padding: 20px;
+      font-size: .78rem;
+      color: var(--ink-faint);
+    }
+    .page-footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    /* ============================================================
+       UTILITIES
+    ============================================================ */
+    @media (max-width: 500px) {
+      .actions-grid { grid-template-columns: 1fr; }
+      .receipt-meta { grid-template-columns: 1fr; }
+    }
+    /* ============================================================
+       FREE PLAN NOTICE
+    ============================================================ */
+    .free-plan-notice {
+      font-size: .78rem;
+      color: var(--ink-muted);
+      margin-top: 10px;
+      text-align: center;
+    }
+    .free-plan-notice strong { color: var(--ink); }
+    .free-plan-notice.hidden { display: none; }
+    /* ============================================================
+       UPGRADE MODAL
+    ============================================================ */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 36px 28px 28px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      animation: fadeSlideUp .3s ease both;
+    }
+    .modal-icon { font-size: 2.4rem; margin-bottom: 12px; }
+    .modal-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--ink);
+      letter-spacing: -.4px;
+      margin-bottom: 8px;
+    }
+    .modal-perks {
+      list-style: none;
+      text-align: left;
+      margin: 0 0 24px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .modal-perks li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .9rem;
+      color: var(--ink);
+    }
+    .modal-perks li::before { content: '✅'; flex-shrink: 0; }
+    .btn-modal-upgrade {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity var(--transition), transform var(--transition);
+      margin-bottom: 10px;
+    }
+    .btn-modal-upgrade:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-modal-close {
+      background: none;
+      border: none;
+      color: var(--ink-muted);
+      font-size: .82rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      padding: 4px 8px;
+    }
+    .btn-modal-close:hover { color: var(--ink); }
+    /* Receipt watermark — hidden for Pro */
+    .receipt-watermark.pro-hidden { display: none; }
+
+    /* ============================================================
+       LOGIN MODAL
+    ============================================================ */
+    .login-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 600;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-modal.open { display: flex; }
+    .login-box {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 32px 28px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      animation: fadeSlideUp .3s ease both;
+    }
+    .login-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .login-subtitle {
+      font-size: .85rem;
+      color: var(--ink-muted);
+      margin-bottom: 24px;
+    }
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .btn-login:hover {
+      background: #1447c0;
+      transform: translateY(-1px);
+    }
+    .btn-login:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <!-- ======================================================
+       TOPBAR
+  ====================================================== -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <span>🧾</span>
+      ReceiptPro
+    </div>
+    <button class="btn-upgrade-topbar" id="btn-upgrade-topbar" onclick="openUpgradeModal()">
+      ⚡ Upgrade to Pro
+    </button>
+  </header>
+
+  <!-- ======================================================
+       HERO
+  ====================================================== -->
+  <section class="hero">
+    <h1>Generate <em>Professional Receipts</em><br>in Seconds</h1>
+    <p>Perfect for small businesses. Fill the form, get a beautiful receipt, share it on WhatsApp instantly.</p>
+  </section>
+
+  <!-- ======================================================
+       MAIN CONTENT
+  ====================================================== -->
+  <main class="main">
+    <!-- ---- FORM COLUMN ---- -->
+    <section class="card">
+      <div class="card-header">
+        <div class="card-header-icon">📝</div>
+        <div>
+          <div class="card-header-title">Receipt Details</div>
+          <div class="card-header-sub">Fill in the information below</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <form id="receipt-form">
+          <div class="field">
+            <label for="biz-name">Business Name</label>
+            <input type="text" id="biz-name" placeholder="Your Company Inc." required />
+          </div>
+          <div class="field">
+            <label for="customer-name">Customer Name</label>
+            <input type="text" id="customer-name" placeholder="John Doe" required />
+          </div>
+          <div class="field">
+            <label for="receipt-date">Date</label>
+            <input type="date" id="receipt-date" required />
+          </div>
+          <div class="field">
+            <label for="item-desc">Item / Service Description</label>
+            <input type="text" id="item-desc" placeholder="Website Design" required />
+          </div>
+          <div class="field">
+            <label>Amount</label>
+            <div class="currency-row">
+              <select id="currency">
+                <option value="$">USD</option>
+                <option value="€">EUR</option>
+                <option value="£">GBP</option>
+                <option value="₹">INR</option>
+                <option value="¥">JPY</option>
+                <option value="₩">KRW</option>
+                <option value="shs">UGX</option>
+              </select>
+              <div class="amount-wrap">
+                <span class="amount-prefix" id="amount-prefix">$ </span>
+                <input type="number" id="amount" placeholder="0.00" step="0.01" required />
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn-generate">
+            ✨ Generate Receipt
+          </button>
+        </form>
+        <div class="free-plan-notice" id="free-plan-notice">
+          <strong>Free Plan:</strong> 5 receipts per month
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- PREVIEW COLUMN ---- -->
+    <div class="preview-col">
+      <!-- Empty state -->
+      <section class="card" id="empty-card">
+        <div class="empty-state">
+          <div class="empty-icon">🧾</div>
+          <h3>No Receipt Yet</h3>
+          <p>Fill the form on the left to generate your first receipt</p>
+        </div>
+      </section>
+
+      <!-- Receipt preview -->
+      <section class="card receipt-wrapper" id="receipt-wrapper">
+        <div id="receipt">
+          <div class="receipt-corner"></div>
+          <div class="receipt-brand">
+            <div class="receipt-brand-logo">🧾</div>
+            <div>
+              <div class="receipt-biz-name" id="r-biz-name">—</div>
+              <div class="receipt-type-label">Official Receipt</div>
+            </div>
+          </div>
+          <div class="receipt-meta">
+            <div class="receipt-meta-item">
+              <label>Receipt No.</label>
+              <span id="r-receipt-no">—</span>
+            </div>
+            <div class="receipt-meta-item">
+              <label>Date</label>
+              <span id="r-date">—</span>
+            </div>
+            <div class="receipt-meta-item">
+              <label>Customer</label>
+              <span id="r-customer">—</span>
+            </div>
+            <div class="receipt-meta-item">
+              <label>Payment Status</label>
+              <span style="color: var(--success);">✓ Paid</span>
+            </div>
+          </div>
+          <hr class="receipt-divider" />
+          <table class="receipt-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="r-item-desc">—</td>
+                <td id="r-item-amount">—</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="receipt-total-row">
+            <div class="receipt-total-label">Total Amount</div>
+            <div class="receipt-total-amount" id="r-total">—</div>
+          </div>
+          <div class="receipt-footer">
+            <p>Thank you for your business!</p>
+            <div class="receipt-watermark" id="watermark">
+              Created with ReceiptPro Free
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Actions -->
+      <section class="card actions-card" id="actions-card">
+        <div class="card-body">
+          <div class="actions-grid">
+            <button class="btn-action btn-pdf" onclick="downloadPDF()">
+              📄 Download PDF
+            </button>
+            <button class="btn-action btn-whatsapp" onclick="shareWhatsApp()">
+              💬 Share on WhatsApp
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ======================================================
+       FOOTER
+  ====================================================== -->
+  <footer class="page-footer">
+    Built with ❤️ by <a href="#">ReceiptPro Team</a>
+  </footer>
+
+  <!-- ======================================================
+       LOGIN MODAL
+  ====================================================== -->
+  <div class="login-modal" id="login-modal">
+    <div class="login-box">
+      <div class="login-title">Welcome to ReceiptPro</div>
+      <div class="login-subtitle">Enter your phone number to continue</div>
+      <form id="login-form">
+        <div class="field">
+          <label for="phone-number">Phone Number</label>
+          <input type="tel" id="phone-number" placeholder="+1234567890" required />
+          <div class="field-error" id="phone-error">Please enter a valid phone number</div>
+        </div>
+        <button type="submit" class="btn-login" id="btn-login">
+          Continue
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       UPGRADE MODAL
+  ====================================================== -->
+  <div class="modal-overlay" id="upgrade-modal">
+    <div class="modal-box">
+      <div class="modal-icon">⚡</div>
+      <h2 class="modal-title">Upgrade to Pro</h2>
+      
+      <!-- Step 1: Initial upgrade info -->
+      <div id="upgrade-step-1">
+        <ul class="modal-perks">
+          <li>Unlimited receipts per month</li>
+          <li>No watermark on PDFs</li>
+          <li>Priority support</li>
+          <li>Custom branding options</li>
+        </ul>
+        <button class="btn-modal-upgrade" onclick="initiateUpgrade()">
+          Upgrade Now — $9.99/mo
+        </button>
+        <button class="btn-modal-close" onclick="closeUpgradeModal()">
+          Maybe later
+        </button>
+      </div>
+
+      <!-- Step 2: Phone number entry -->
+      <div id="upgrade-step-2" style="display: none;">
+        <p style="text-align: left; font-size: 0.9rem; color: var(--ink-muted); margin-bottom: 16px;">
+          Enter your phone number to receive a PIN for payment.
+        </p>
+        <form id="payment-phone-form">
+          <div class="field" style="margin-bottom: 16px;">
+            <label for="payment-phone" style="display: block; margin-bottom: 6px;">Phone Number</label>
+            <input type="tel" id="payment-phone" placeholder="+256..." required />
+            <div class="field-error" id="payment-phone-error"></div>
+          </div>
+          <button type="submit" class="btn-modal-upgrade" id="btn-send-pin">
+            Send PIN
+          </button>
+          <button type="button" class="btn-modal-close" onclick="goBackToUpgradeStep1()">
+            Back
+          </button>
+        </form>
+      </div>
+
+      <!-- Step 3: PIN entry -->
+      <div id="upgrade-step-3" style="display: none;">
+        <p style="text-align: left; font-size: 0.9rem; color: var(--ink-muted); margin-bottom: 16px;">
+          Enter the PIN you received on your phone and the PIN ID.
+        </p>
+        <form id="payment-pin-form">
+          <div class="field" style="margin-bottom: 12px;">
+            <label for="payment-pin-id">PIN ID</label>
+            <input type="text" id="payment-pin-id" placeholder="PIN ID from SMS" required />
+            <div class="field-error" id="payment-pinid-error"></div>
+          </div>
+          <div class="field" style="margin-bottom: 16px;">
+            <label for="payment-pin">PIN Code</label>
+            <input type="text" id="payment-pin" placeholder="6-digit PIN" required />
+            <div class="field-error" id="payment-pin-error"></div>
+          </div>
+          <button type="submit" class="btn-modal-upgrade" id="btn-complete-payment">
+            Complete Payment
+          </button>
+          <button type="button" class="btn-modal-close" onclick="goBackToPhoneEntry()">
+            Back
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ======================================================
+       JAVASCRIPT
+  ====================================================== -->
+  <script>
+    // ============================================================
+    // STATE & CONFIG
+    // ============================================================
+    const API_BASE = 'http://localhost:8000';
+    const FREE_LIMIT = 5;
+    let receiptCount = 0;
+    let isPaid = false;
+    let userId = null;
+
+    // ============================================================
+    // INITIALIZATION
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Load receipt count from localStorage
+      const storedCount = localStorage.getItem('receipt_count');
+      receiptCount = storedCount ? parseInt(storedCount, 10) : 0;
+      
+      // Update free plan notice with initial count
+      if (!isPaid && receiptCount > 0) {
+        const remaining = FREE_LIMIT - receiptCount;
+        if (remaining > 0) {
+          document.getElementById('free-plan-notice').innerHTML = 
+            `<strong>Free Plan:</strong> ${remaining} receipts remaining this month`;
+        }
+      }
+      
+      // Set today's date
+      document.getElementById('receipt-date').valueAsDate = new Date();
+      
+      // Update currency prefix
+      document.getElementById('currency').addEventListener('change', (e) => {
+        document.getElementById('amount-prefix').textContent = e.target.value;
+      });
+
+      // Check for existing user
+      userId = localStorage.getItem('user_id');
+      
+      if (!userId) {
+        // Show login modal
+        document.getElementById('login-modal').classList.add('open');
+      } else {
+        // User exists, check payment verification
+        await checkPaymentVerification();
+      }
+    });
+
+    // ============================================================
+    // LOGIN FLOW
+    // ============================================================
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const phoneNumber = document.getElementById('phone-number').value.trim();
+      const phoneError = document.getElementById('phone-error');
+      const btnLogin = document.getElementById('btn-login');
+      
+      if (!phoneNumber) {
+        phoneError.classList.add('visible');
+        return;
+      }
+      
+      phoneError.classList.remove('visible');
+      btnLogin.disabled = true;
+      btnLogin.textContent = 'Logging in...';
+      
+      try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneNumber })
+        });
+        
+        if (!response.ok) throw new Error('Login failed');
+        
+        const data = await response.json();
+        
+        // Store user data
+        userId = data.user_id;
+        isPaid = data.is_paid || false;
+        localStorage.setItem('user_id', userId);
+        
+        // Close login modal
+        document.getElementById('login-modal').classList.remove('open');
+        
+        // Update UI based on payment status
+        updateUIForPaymentStatus();
+        
+        showToast('Login successful!');
+      } catch (error) {
+        console.error('Login error:', error);
+        showToast('Login failed. Please try again.');
+        phoneError.textContent = 'Login failed. Please try again.';
+        phoneError.classList.add('visible');
+      } finally {
+        btnLogin.disabled = false;
+        btnLogin.textContent = 'Continue';
+      }
+    });
+
+    // ============================================================
+    // PAYMENT VERIFICATION
+    // ============================================================
+    async function checkPaymentVerification() {
+      // Payment is now handled directly in the modal payment flow
+      // Just update UI with current payment status from login
+      updateUIForPaymentStatus();
+    }
+
+    // ============================================================
+    // UI UPDATE BASED ON PAYMENT STATUS
+    // ============================================================
+    function updateUIForPaymentStatus() {
+      const upgradeBtn = document.getElementById('btn-upgrade-topbar');
+      const freePlanNotice = document.getElementById('free-plan-notice');
+      const watermark = document.getElementById('watermark');
+      
+      if (isPaid) {
+        // Pro user
+        upgradeBtn.classList.add('hidden');
+        freePlanNotice.classList.add('hidden');
+        watermark.classList.add('pro-hidden');
+      } else {
+        // Free user
+        upgradeBtn.classList.remove('hidden');
+        freePlanNotice.classList.remove('hidden');
+        watermark.classList.remove('pro-hidden');
+      }
+    }
+
+    // ============================================================
+    // RECEIPT GENERATION
+    // ============================================================
+    document.getElementById('receipt-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Check free plan limit before generating
+      if (!isPaid && receiptCount >= FREE_LIMIT) {
+        openUpgradeModal();
+        showToast('Free plan limit reached. Upgrade to continue.');
+        return;
+      }
+      
+      // Get form values
+      const bizName = document.getElementById('biz-name').value;
+      const customerName = document.getElementById('customer-name').value;
+      const date = document.getElementById('receipt-date').value;
+      const itemDesc = document.getElementById('item-desc').value;
+      const currency = document.getElementById('currency').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      
+      if (!amount || amount <= 0) {
+        showToast('Please enter a valid amount');
+        return;
+      }
+      
+      // Generate receipt number
+      const receiptNo = `RCP-${Date.now().toString().slice(-8)}`;
+      
+      // Format amount
+      const formattedAmount = `${currency}${amount.toFixed(2)}`;
+      
+      // Populate receipt
+      document.getElementById('r-biz-name').textContent = bizName;
+      document.getElementById('r-receipt-no').textContent = receiptNo;
+      document.getElementById('r-date').textContent = new Date(date).toLocaleDateString();
+      document.getElementById('r-customer').textContent = customerName;
+      document.getElementById('r-item-desc').textContent = itemDesc;
+      document.getElementById('r-item-amount').textContent = formattedAmount;
+      document.getElementById('r-total').textContent = formattedAmount;
+      
+      // Show receipt
+      document.getElementById('empty-card').style.display = 'none';
+      document.getElementById('receipt-wrapper').classList.add('visible');
+      document.getElementById('actions-card').classList.add('visible');
+      
+      // Increment count and save to localStorage for free users
+      if (!isPaid) {
+        receiptCount++;
+        localStorage.setItem('receipt_count', receiptCount);
+        const remaining = FREE_LIMIT - receiptCount;
+        if (remaining > 0) {
+          document.getElementById('free-plan-notice').innerHTML = 
+            `<strong>Free Plan:</strong> ${remaining} receipts remaining this month`;
+        }
+      }
+      
+      showToast('Receipt generated successfully!');
+    });
+
+    // ============================================================
+    // UPGRADE FLOW - MULTI-STEP PAYMENT
+    // ============================================================
+    function openUpgradeModal() {
+      document.getElementById('upgrade-modal').classList.add('open');
+      // Reset to step 1
+      document.getElementById('upgrade-step-1').style.display = 'block';
+      document.getElementById('upgrade-step-2').style.display = 'none';
+      document.getElementById('upgrade-step-3').style.display = 'none';
+    }
+    
+    function closeUpgradeModal() {
+      document.getElementById('upgrade-modal').classList.remove('open');
+      // Reset states
+      document.getElementById('payment-phone-form').reset();
+      document.getElementById('payment-pin-form').reset();
+      document.getElementById('payment-phone-error').textContent = '';
+      document.getElementById('payment-pin-error').textContent = '';
+      document.getElementById('payment-pinid-error').textContent = '';
+    }
+
+    // Step 1: User clicks "Upgrade Now"
+    function initiateUpgrade() {
+      if (!userId) {
+        showToast('Please login first');
+        return;
+      }
+      
+      // Move to phone entry step
+      document.getElementById('upgrade-step-1').style.display = 'none';
+      document.getElementById('upgrade-step-2').style.display = 'block';
+    }
+
+    // Step 1.5: Go back from phone entry to initial upgrade
+    function goBackToUpgradeStep1() {
+      document.getElementById('upgrade-step-1').style.display = 'block';
+      document.getElementById('upgrade-step-2').style.display = 'none';
+      document.getElementById('payment-phone-form').reset();
+      document.getElementById('payment-phone-error').textContent = '';
+    }
+
+    // Step 2: Send PIN to phone number
+    document.getElementById('payment-phone-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const phoneNumber = document.getElementById('payment-phone').value.trim();
+      const phoneError = document.getElementById('payment-phone-error');
+      const btnSendPin = document.getElementById('btn-send-pin');
+      
+      if (!phoneNumber) {
+        phoneError.textContent = 'Phone number is required';
+        return;
+      }
+      
+      phoneError.textContent = '';
+      btnSendPin.disabled = true;
+      btnSendPin.textContent = 'Sending PIN...';
+      
+      try {
+        const response = await fetch(`${API_BASE}/payments/send-pin`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone_number: phoneNumber })
+        });
+        
+        if (!response.ok) throw new Error('Failed to send PIN');
+        
+        const data = await response.json();
+        
+        // Store phone for later use
+        window.paymentPhone = phoneNumber;
+        
+        // Move to PIN entry step
+        document.getElementById('upgrade-step-2').style.display = 'none';
+        document.getElementById('upgrade-step-3').style.display = 'block';
+        
+        showToast('PIN sent to your phone!');
+      } catch (error) {
+        console.error('Send PIN error:', error);
+        phoneError.textContent = 'Failed to send PIN. Please try again.';
+        showToast('Failed to send PIN. Please try again.');
+      } finally {
+        btnSendPin.disabled = false;
+        btnSendPin.textContent = 'Send PIN';
+      }
+    });
+
+    // Step 2.5: Go back from PIN entry to phone entry
+    function goBackToPhoneEntry() {
+      document.getElementById('upgrade-step-2').style.display = 'block';
+      document.getElementById('upgrade-step-3').style.display = 'none';
+      document.getElementById('payment-pin-form').reset();
+      document.getElementById('payment-pin-error').textContent = '';
+      document.getElementById('payment-pinid-error').textContent = '';
+    }
+
+    // Step 3: Complete payment with PIN
+    document.getElementById('payment-pin-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const pinId = document.getElementById('payment-pin-id').value.trim();
+      const pin = document.getElementById('payment-pin').value.trim();
+      const pinError = document.getElementById('payment-pin-error');
+      const pinIdError = document.getElementById('payment-pinid-error');
+      const btnCompletePayment = document.getElementById('btn-complete-payment');
+      
+      let hasError = false;
+      
+      if (!pinId) {
+        pinIdError.textContent = 'PIN ID is required';
+        hasError = true;
+      }
+      
+      if (!pin) {
+        pinError.textContent = 'PIN is required';
+        hasError = true;
+      }
+      
+      if (hasError) return;
+      
+      pinError.textContent = '';
+      pinIdError.textContent = '';
+      btnCompletePayment.disabled = true;
+      btnCompletePayment.textContent = 'Processing...';
+      
+      try {
+        const response = await fetch(`${API_BASE}/payments/pay`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone_number: window.paymentPhone,
+            amount: 9.99,
+            currency: 'UGX',
+            pin: pin,
+            pin_id: pinId
+          })
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.detail || 'Payment failed');
+        }
+        
+        const data = await response.json();
+        
+        // Payment successful
+        isPaid = true;
+        window.paymentPhone = null;
+        
+        closeUpgradeModal();
+        updateUIForPaymentStatus();
+        
+        showToast('🎉 Payment successful! You are now a Pro user!');
+      } catch (error) {
+        console.error('Payment error:', error);
+        pinError.textContent = error.message || 'Payment failed. Please try again.';
+        showToast('Payment failed: ' + (error.message || 'Please try again'));
+      } finally {
+        btnCompletePayment.disabled = false;
+        btnCompletePayment.textContent = 'Complete Payment';
+      }
+    });
+
+    // ============================================================
+    // PDF DOWNLOAD
+    // ============================================================
+    function downloadPDF() {
+      // Get the receipt element HTML
+      const receiptElement = document.getElementById('receipt');
+      const receiptHTML = receiptElement.innerHTML;
+      
+      // Open a new window
+      const printWindow = window.open('', '', 'width=800,height=600');
+      
+      // Build the HTML document with proper formatting
+      const head = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Receipt - ReceiptPro</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;padding:20px;color:#0f0f10;line-height:1.6}@media print{body{padding:0;margin:0}}#receipt{background:#fff;max-width:600px;margin:0 auto;padding:32px 28px;border-radius:14px}.receipt-brand{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:18px;border-bottom:2px dashed #e5e7eb}.receipt-brand-logo{width:40px;height:40px;background:#1a56db;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem}.receipt-biz-name{font-weight:800;font-size:1.1rem;color:#0f0f10}.receipt-type-label{font-size:.72rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#1a56db;margin-top:2px}.receipt-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-bottom:22px}.receipt-meta-item label{font-size:.7rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#6b6b74;margin-bottom:2px}.receipt-meta-item span{font-size:.88rem;color:#0f0f10;font-weight:500}.receipt-divider{border:none;border-top:1.5px solid #f3f4f6;margin:16px 0}.receipt-table{width:100%;border-collapse:collapse;margin-bottom:18px}.receipt-table thead tr{border-bottom:1.5px solid #f3f4f6}.receipt-table th{font-size:.72rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#6b6b74;padding:6px 0 8px;text-align:left}.receipt-table th:last-child{text-align:right}.receipt-table td{padding:10px 0;font-size:.9rem;color:#0f0f10;border-bottom:1px solid #f9fafb}.receipt-table td:last-child{text-align:right;font-weight:600}.receipt-total-row{display:flex;justify-content:space-between;align-items:center;background:#dce9ff;border-radius:8px;padding:12px 14px;margin-bottom:20px}.receipt-total-label{font-size:.8rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#1a56db}.receipt-total-amount{font-size:1.3rem;font-weight:800;color:#1a56db}.receipt-footer{text-align:center;padding-top:16px;border-top:2px dashed #e5e7eb}.receipt-footer p{font-size:.82rem;color:#6b6b74;font-style:italic}.receipt-watermark{margin-top:10px;font-size:.68rem;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:#c4c4cc}</style></head>';
+      const body = '<body><div id="receipt">' + receiptHTML + '</div><script>window.onload=function(){setTimeout(function(){window.print();},250);}<' + '/script></body>';
+      const htmlContent = '<!DOCTYPE html><html lang="en">' + head + body + '</html>';
+      
+      // Write the document into the new window
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      
+      showToast('Opening print dialog...');
+    }
+
+    // ============================================================
+    // WHATSAPP SHARE
+    // ============================================================
+    function shareWhatsApp() {
+      const bizName = document.getElementById('r-biz-name').textContent;
+      const amount = document.getElementById('r-total').textContent;
+      const message = `Receipt from ${bizName}\nTotal: ${amount}\n\nGenerated with ReceiptPro`;
+      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+      showToast('Opening WhatsApp...');
+    }
+
+    // ============================================================
+    // TOAST NOTIFICATION
+    // ============================================================
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
