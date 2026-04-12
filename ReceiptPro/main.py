@@ -17,7 +17,7 @@ app = FastAPI(
 # Configure CORS to accept requests from any origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://developer1-2.github.io/Climb/ReceiptPro/receiptpro-integrated.html"],
+    allow_origins=["https://developer1-2.github.io/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
