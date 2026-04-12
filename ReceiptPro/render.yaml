@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: receiptpro-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 8000
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
+      - key: EVERSEND_BASE_URL
+        value: https://api.eversend.co/v1
+      - key: CLIENT_ID
+        sync: false
+      - key: CLIENT_SECRET
+        sync: false
+      - key: EVERSEND_BUSINESS_ID
+        sync: false
+      - key: EVERSEND_CALLBACK_URL
+        sync: false
