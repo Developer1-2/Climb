@@ -18,8 +18,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://developer1-2.github.io/Climb/ReceiptPro/receiptpro-integrated.html"],
-    allow_credentials=False,
-    allow_methods=["PUT", "POST", "GET", "DELETE"],
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
