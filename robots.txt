@@ -1,1 +1,1 @@
-sitemap:  https://developer1-2.github.io/Climb/sitemap.xml
+sitemap: https://climbug.netlify.app/sitemap.xml
